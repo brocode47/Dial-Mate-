@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'UrduVerify AI',
-  description: 'AI-powered Urdu voice calling agent for Shopify stores.',
+  title: 'Dial Mate',
+  description: 'Your intelligent calling assistant.',
 };
 
 export default function RootLayout({
