@@ -45,6 +45,8 @@ type Summary = {
   sentiment: 'مثبت' | 'منفی' | 'غیر جانبدار';
 };
 
+const CONFIRMATION_SCRIPT = "Assalamualaikum! Kya main {customerName} se baat kar raha hoon? Aap ne hamari website se {productName} order kiya tha, jiski price {productPrice} Rupees hai. Kya aap apna order confirm karte hain?";
+
 export function CallSimulation({ order }: { order: Order }) {
   const { toast } = useToast();
   const [isCalling, setIsCalling] = useState(false);
@@ -76,6 +78,7 @@ export function CallSimulation({ order }: { order: Order }) {
       customerName: order.customerName,
       productName: order.productName,
       productPrice: order.productPrice,
+      script: CONFIRMATION_SCRIPT,
     });
 
     if ('error' in result || !result.spokenGreetingAudioUri) {
@@ -94,8 +97,11 @@ export function CallSimulation({ order }: { order: Order }) {
       audioRef.current.play().catch((e) => console.error('Audio play error:', e));
     }
     
-    // Simulate getting the text version of the greeting
-    const greetingText = `Assalamualaikum! Kya main ${order.customerName} se baat kar raha hoon? Aap ne hamari website se ${order.productName} order kiya tha, jiski price ${order.productPrice} hai. Kya aap apna order confirm karte hain?`;
+    const greetingText = CONFIRMATION_SCRIPT
+        .replace('{customerName}', order.customerName)
+        .replace('{productName}', order.productName)
+        .replace('{productPrice}', order.productPrice);
+
     setConversation([{ speaker: 'agent', text: greetingText }]);
 
     setIsCalling(false);
@@ -110,6 +116,7 @@ export function CallSimulation({ order }: { order: Order }) {
         customerName: order.customerName,
         productName: order.productName,
         productPrice: order.productPrice,
+        script: CONFIRMATION_SCRIPT,
       },
     });
 

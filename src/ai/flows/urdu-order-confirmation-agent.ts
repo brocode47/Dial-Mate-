@@ -16,6 +16,7 @@ const UrduOrderConfirmationInputSchema = z.object({
   customerName: z.string().describe('The name of the customer.'),
   productName: z.string().describe('The name of the product ordered.'),
   productPrice: z.string().describe('The price of the product.'),
+  script: z.string().describe('The text-to-speech script with placeholders.'),
 });
 export type UrduOrderConfirmationInput = z.infer<typeof UrduOrderConfirmationInputSchema>;
 
@@ -66,13 +67,6 @@ async function toWav(
   });
 }
 
-const urduOrderConfirmationPrompt = ai.definePrompt({
-  name: 'urduOrderConfirmationPrompt',
-  input: { schema: UrduOrderConfirmationInputSchema },
-  output: { schema: z.string().describe('The Urdu greeting and order confirmation message.') },
-  prompt: `Assalamualaikum! Kya main {{{customerName}}} se baat kar raha hoon? Aap ne hamari website se {{{productName}}} order kiya tha, jiski price {{{productPrice}}} Rupees hai. Kya aap apna order confirm karte hain?`,
-});
-
 const urduOrderConfirmationFlow = ai.defineFlow(
   {
     name: 'urduOrderConfirmationFlow',
@@ -80,7 +74,10 @@ const urduOrderConfirmationFlow = ai.defineFlow(
     outputSchema: UrduOrderConfirmationOutputSchema,
   },
   async (input) => {
-    const { output: generatedText } = await urduOrderConfirmationPrompt(input);
+    const generatedText = input.script
+      .replace('{customerName}', input.customerName)
+      .replace('{productName}', input.productName)
+      .replace('{productPrice}', input.productPrice);
 
     if (!generatedText) {
       throw new Error('Failed to generate Urdu confirmation text.');

@@ -8,6 +8,7 @@ const UrduOrderConfirmationInputSchema = z.object({
   customerName: z.string().describe('The name of the customer.'),
   productName: z.string().describe('The name of the product ordered.'),
   productPrice: z.string().describe('The price of the product.'),
+  script: z.string().describe('The text-to-speech script with placeholders.'),
 });
 
 const InitiateLiveCallInputSchema = z.object({
@@ -24,15 +25,6 @@ const InitiateLiveCallOutputSchema = z.object({
 export type InitiateLiveCallOutput = z.infer<
   typeof InitiateLiveCallOutputSchema
 >;
-
-const urduOrderConfirmationPrompt = ai.definePrompt({
-  name: 'urduOrderConfirmationLiveCallPrompt',
-  input: { schema: UrduOrderConfirmationInputSchema },
-  output: {
-    schema: z.string().describe('The Urdu greeting and order confirmation message.'),
-  },
-  prompt: `Assalamualaikum! Kya main {{{customerName}}} se baat kar raha hoon? Aap ne hamari website se {{{productName}}} order kiya tha, jiski price {{{productPrice}}} Rupees hai. Kya aap apna order confirm karte hain?`,
-});
 
 const initiateLiveCallFlow = ai.defineFlow(
   {
@@ -53,9 +45,10 @@ const initiateLiveCallFlow = ai.defineFlow(
 
     const client = twilio(accountSid, authToken);
 
-    const { output: generatedText } = await urduOrderConfirmationPrompt(
-      input.order
-    );
+    const generatedText = input.order.script
+      .replace('{customerName}', input.order.customerName)
+      .replace('{productName}', input.order.productName)
+      .replace('{productPrice}', input.order.productPrice);
 
     if (!generatedText) {
       throw new Error('Failed to generate call script text.');
