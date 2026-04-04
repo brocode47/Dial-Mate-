@@ -23,12 +23,14 @@ import {
   Sparkles,
   HeartPulse,
   Download,
+  PhoneForwarded,
 } from 'lucide-react';
 import { type Order } from '@/lib/mock-data';
 import {
   startOrderConfirmationCall,
   getIntelligentResponse,
   getCallSummary,
+  startLiveCall,
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -46,6 +48,7 @@ type Summary = {
 export function CallSimulation({ order }: { order: Order }) {
   const { toast } = useToast();
   const [isCalling, setIsCalling] = useState(false);
+  const [isLiveCalling, setIsLiveCalling] = useState(false);
   const [isAnswering, setIsAnswering] = useState(false);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [callStarted, setCallStarted] = useState(false);
@@ -98,6 +101,34 @@ export function CallSimulation({ order }: { order: Order }) {
     setIsCalling(false);
     setCallStarted(true);
   };
+
+  const handleStartLiveCall = async () => {
+    setIsLiveCalling(true);
+    const result = await startLiveCall({
+      to: order.customerPhone,
+      order: {
+        customerName: order.customerName,
+        productName: order.productName,
+        productPrice: order.productPrice,
+      },
+    });
+
+    if ('error' in result) {
+      toast({
+        variant: 'destructive',
+        title: 'Error Starting Live Call',
+        description: result.error,
+      });
+    } else {
+      toast({
+        title: 'Live Call Initiated',
+        description: `Call SID: ${result.callSid}. Your phone should be ringing shortly.`,
+      });
+    }
+
+    setIsLiveCalling(false);
+  };
+
 
   const handleSendQuery = async () => {
     if (!customerQuery.trim()) return;
@@ -220,7 +251,7 @@ ${conversation.map(turn => `${turn.speaker}: ${turn.text}`).join('\n')}
               ) : (
                 <Phone className="mr-2 h-4 w-4" />
               )}
-              Start Verification Call
+              Start Simulation
             </Button>
           </div>
         )}
@@ -330,17 +361,23 @@ ${conversation.map(turn => `${turn.speaker}: ${turn.text}`).join('\n')}
               ) : (
                 <PhoneOff className="mr-2 h-4 w-4" />
               )}
-              End Call & Summarize
+              End Simulation
             </Button>
           ) : (
-             <Button size="lg" onClick={handleStartCall} disabled={isCalling}>
-              {isCalling ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Phone className="mr-2 h-4 w-4" />
-              )}
-              Start New Call
-            </Button>
+             <>
+              <Button variant="outline" onClick={handleStartLiveCall} disabled={isCalling || isLiveCalling}>
+                  {isLiveCalling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PhoneForwarded className="mr-2 h-4 w-4" />}
+                  Live Call
+              </Button>
+              <Button onClick={handleStartCall} disabled={isCalling || isLiveCalling}>
+                {isCalling ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Phone className="mr-2 h-4 w-4" />
+                )}
+                {summary ? 'New Simulation' : 'Simulate Call'}
+              </Button>
+             </>
           )}
         </div>
       </CardFooter>

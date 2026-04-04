@@ -13,6 +13,10 @@ import {
   urduOrderConfirmationAgent,
   type UrduOrderConfirmationInput,
 } from '@/ai/flows/urdu-order-confirmation-agent';
+import {
+  initiateLiveCall,
+  type InitiateLiveCallInput,
+} from '@/ai/flows/initiate-live-call';
 
 export async function startOrderConfirmationCall(
   input: UrduOrderConfirmationInput
@@ -45,5 +49,15 @@ export async function getCallSummary(input: UrduCallSummaryAndSentimentInput) {
   } catch (error) {
     console.error('Error in getCallSummary:', error);
     return { error: 'Failed to get summary.' };
+  }
+}
+
+export async function startLiveCall(input: InitiateLiveCallInput) {
+  try {
+    const result = await initiateLiveCall(input);
+    return result;
+  } catch (error: any) {
+    console.error('Error in startLiveCall:', error);
+    return { error: error.message || 'Failed to start live call.' };
   }
 }

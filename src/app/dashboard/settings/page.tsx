@@ -33,9 +33,12 @@ export default function SettingsPage() {
 
       <Alert>
         <Info className="h-4 w-4" />
-        <AlertTitle>Sandbox Mode</AlertTitle>
+        <AlertTitle>Connecting to Live Services</AlertTitle>
         <AlertDescription>
-          This application is currently in a sandbox mode. The settings below are for demonstration purposes. To connect to live services, you'll need to run this project in your own development environment and provide real API keys.
+          This application is currently in a sandbox mode. To connect to live services like Twilio for making real calls, you need to run this project on your own computer and create a `.env.local` file in the project's root directory with your API credentials.
+          <pre className="mt-2 rounded-md bg-muted p-2 text-xs font-mono">
+            {`TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxx\nTWILIO_AUTH_TOKEN=your_auth_token\nTWILIO_PHONE_NUMBER=+15017122661`}
+          </pre>
         </AlertDescription>
       </Alert>
 
