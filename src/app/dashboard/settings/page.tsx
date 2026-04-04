@@ -18,7 +18,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Bot, PhoneOutgoing, Save } from 'lucide-react';
+import { Bot, PhoneOutgoing, Save, Info } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function SettingsPage() {
   return (
@@ -29,6 +30,14 @@ export default function SettingsPage() {
           <Save className="mr-2" /> Save All Settings
         </Button>
       </div>
+
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Sandbox Mode</AlertTitle>
+        <AlertDescription>
+          This application is currently in a sandbox mode. The settings below are for demonstration purposes. To connect to live services, you'll need to run this project in your own development environment and provide real API keys.
+        </AlertDescription>
+      </Alert>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="lg:col-span-1">
