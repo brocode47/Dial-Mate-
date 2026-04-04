@@ -12,10 +12,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Download } from 'lucide-react';
 import { type Order } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 
@@ -90,6 +91,11 @@ export function RecentCalls({ orders }: RecentCallsProps) {
                   </DropdownMenuItem>
                   <DropdownMenuItem>Trigger Call Again</DropdownMenuItem>
                   <DropdownMenuItem>Mark as Confirmed</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem disabled>
+                    <Download className="mr-2 h-4 w-4" />
+                    <span>Download Summary</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>

@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import {
   Phone,
@@ -23,6 +22,7 @@ import {
   Bot,
   Sparkles,
   HeartPulse,
+  Download,
 } from 'lucide-react';
 import { type Order } from '@/lib/mock-data';
 import {
@@ -31,6 +31,7 @@ import {
   getCallSummary,
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 type ConversationTurn = {
   speaker: 'agent' | 'customer';
@@ -155,6 +156,40 @@ export function CallSimulation({ order }: { order: Order }) {
     setCallStarted(false);
   };
 
+  const handleDownloadSummary = () => {
+    if (!summary) return;
+
+    const summaryContent = `
+Order ID: ${order.id}
+Customer: ${order.customerName}
+Product: ${order.productName}
+Date: ${new Date().toLocaleDateString()}
+
+Sentiment: ${summary.sentiment === 'مثبت' ? 'Positive' : summary.sentiment === 'منفی' ? 'Negative' : 'Neutral'}
+
+Summary (Urdu):
+${summary.summary}
+
+Conversation Transcript:
+${conversation.map(turn => `${turn.speaker}: ${turn.text}`).join('\n')}
+    `;
+
+    const blob = new Blob([summaryContent.trim()], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `summary-order-${order.id}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Summary Downloading',
+      description: 'Your file will be downloaded shortly.',
+    });
+  };
+
   const getSentimentBadge = (sentiment: Summary['sentiment']) => {
     switch (sentiment) {
       case 'مثبت':
@@ -268,8 +303,12 @@ export function CallSimulation({ order }: { order: Order }) {
 
         {summary && (
            <Card className="bg-secondary/50">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg"><Sparkles className="h-5 w-5 text-primary" /> Call Summary</CardTitle>
+               <Button variant="outline" size="sm" onClick={handleDownloadSummary}>
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4" style={{direction: 'rtl'}}>
               <p className="text-sm">{summary.summary}</p>
