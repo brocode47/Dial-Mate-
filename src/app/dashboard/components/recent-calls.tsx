@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Table,
@@ -16,15 +19,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Download } from 'lucide-react';
+import { MoreHorizontal, Download, Phone } from 'lucide-react';
 import { type Order } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 type RecentCallsProps = {
   orders: Order[];
 };
 
-export function RecentCalls({ orders }: RecentCallsProps) {
+export function RecentCalls({ orders: initialOrders }: RecentCallsProps) {
+  const { toast } = useToast();
+  const [orders, setOrders] = useState(initialOrders);
+
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
+
+
   const getStatusVariant = (status: Order['status']) => {
     switch (status) {
       case 'Confirmed':
@@ -38,6 +50,26 @@ export function RecentCalls({ orders }: RecentCallsProps) {
       default:
         return 'default';
     }
+  };
+
+  const handleTriggerCall = (orderId: string) => {
+    toast({
+      title: 'Call Simulation Triggered',
+      description: `Initiating a verification call for order ${orderId}.`,
+    });
+  };
+
+  const handleMarkAsConfirmed = (orderId: string) => {
+    setOrders(currentOrders =>
+      currentOrders.map(order =>
+        order.id === orderId ? { ...order, status: 'Confirmed' } : order
+      )
+    );
+    toast({
+      title: 'Order Status Updated',
+      description: `Order ${orderId} has been marked as Confirmed.`,
+      className: 'bg-green-100 dark:bg-green-900',
+    });
   };
 
   return (
@@ -89,8 +121,11 @@ export function RecentCalls({ orders }: RecentCallsProps) {
                   <DropdownMenuItem asChild>
                     <Link href={`/dashboard/order/${order.id}`}>View Details</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Trigger Call Again</DropdownMenuItem>
-                  <DropdownMenuItem>Mark as Confirmed</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleTriggerCall(order.id)}>
+                    <Phone className="mr-2 h-4 w-4" />
+                    <span>Trigger Call Again</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleMarkAsConfirmed(order.id)}>Mark as Confirmed</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem disabled>
                     <Download className="mr-2 h-4 w-4" />

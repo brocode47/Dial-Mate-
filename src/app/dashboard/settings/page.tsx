@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -20,13 +23,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Bot, PhoneOutgoing, Save, Info } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+  const [voice, setVoice] = useState('algenib');
+  const [autoSummarize, setAutoSummarize] = useState(true);
+  const [callRecording, setCallRecording] = useState(false);
+  const [confirmationScript, setConfirmationScript] = useState(
+    'Assalamualaikum! Kya main {customerName} se baat kar raha hoon? Aap ne hamari website se {productName} order kiya tha, jiski price {productPrice} hai. Kya aap apna order confirm karte hain?'
+  );
+  const [cancellationScript, setCancellationScript] = useState(
+    'Assalamualaikum {customerName}. Aap ka order {orderId} cancel kar diya gaya hai. Mazeed maloomat ke liye hamari website visit karein.'
+  );
+  
+  const [shopifyKey, setShopifyKey] = useState('');
+  const [shopifySecret, setShopifySecret] = useState('');
+  const [twilioSid, setTwilioSid] = useState('');
+  const [twilioToken, setTwilioToken] = useState('');
+
+
+  const handleSave = () => {
+    // In a real app, you would save these settings to a backend or local storage.
+    // For this demo, we'll just show a toast notification.
+    console.log('Saving settings:', {
+      voice,
+      autoSummarize,
+      callRecording,
+      confirmationScript,
+      cancellationScript,
+      shopifyKey,
+      shopifySecret,
+      twilioSid,
+      twilioToken
+    });
+
+    toast({
+      title: 'Settings Saved',
+      description: 'Your changes have been successfully saved.',
+    });
+  };
+
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="font-headline text-2xl font-semibold">Settings</h1>
-        <Button>
+        <Button onClick={handleSave}>
           <Save className="mr-2" /> Save All Settings
         </Button>
       </div>
@@ -55,7 +97,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="ai-voice">AI Voice</Label>
-              <Select defaultValue="algenib">
+              <Select value={voice} onValueChange={setVoice}>
                 <SelectTrigger id="ai-voice">
                   <SelectValue placeholder="Select a voice" />
                 </SelectTrigger>
@@ -68,21 +110,21 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div className="space-y-0.5">
-                <Label>Auto-summarize calls</Label>
+                <Label htmlFor="auto-summarize">Auto-summarize calls</Label>
                 <p className="text-xs text-muted-foreground">
                   Automatically generate a summary after each call ends.
                 </p>
               </div>
-              <Switch defaultChecked />
+              <Switch id="auto-summarize" checked={autoSummarize} onCheckedChange={setAutoSummarize} />
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div className="space-y-0.5">
-                <Label>Enable Call Recording</Label>
+                <Label htmlFor="call-recording">Enable Call Recording</Label>
                 <p className="text-xs text-muted-foreground">
                   Simulate call recording for review (no real audio stored).
                 </p>
               </div>
-              <Switch />
+              <Switch id="call-recording" checked={callRecording} onCheckedChange={setCallRecording} />
             </div>
           </CardContent>
         </Card>
@@ -111,7 +153,8 @@ export default function SettingsPage() {
                     id="confirmation-script"
                     placeholder="Enter your script here..."
                     rows={6}
-                    defaultValue="Assalamualaikum! Kya main {customerName} se baat kar raha hoon? Aap ne hamari website se {productName} order kiya tha, jiski price {productPrice} hai. Kya aap apna order confirm karte hain?"
+                    value={confirmationScript}
+                    onChange={(e) => setConfirmationScript(e.target.value)}
                   />
                    <p className="text-xs text-muted-foreground">
                     Use {'{customerName}'}, {'{productName}'}, and {'{productPrice}'} as placeholders.
@@ -127,7 +170,8 @@ export default function SettingsPage() {
                     id="cancellation-script"
                     placeholder="Enter cancellation script..."
                     rows={6}
-                     defaultValue="Assalamualaikum {customerName}. Aap ka order {orderId} cancel kar diya gaya hai. Mazeed maloomat ke liye hamari website visit karein."
+                    value={cancellationScript}
+                    onChange={(e) => setCancellationScript(e.target.value)}
                   />
                    <p className="text-xs text-muted-foreground">
                     Use {'{customerName}'} and {'{orderId}'} as placeholders.
@@ -154,6 +198,8 @@ export default function SettingsPage() {
                 id="shopify-key"
                 placeholder="shpat_..."
                 type="password"
+                value={shopifyKey}
+                onChange={(e) => setShopifyKey(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -162,11 +208,19 @@ export default function SettingsPage() {
                 id="shopify-secret"
                 placeholder="shpss_..."
                 type="password"
+                value={shopifySecret}
+                onChange={(e) => setShopifySecret(e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="twilio-sid">Twilio Account SID</Label>
-              <Input id="twilio-sid" placeholder="AC..." type="password" />
+              <Input 
+                id="twilio-sid" 
+                placeholder="AC..." 
+                type="password"
+                value={twilioSid}
+                onChange={(e) => setTwilioSid(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="twilio-token">Twilio Auth Token</Label>
@@ -174,6 +228,8 @@ export default function SettingsPage() {
                 id="twilio-token"
                 placeholder="Your auth token"
                 type="password"
+                value={twilioToken}
+                onChange={(e) => setTwilioToken(e.target.value)}
               />
             </div>
           </div>
