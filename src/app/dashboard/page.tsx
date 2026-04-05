@@ -9,6 +9,8 @@ import { RecentCalls } from './components/recent-calls';
 import { CheckCircle2, Clock, Phone, XCircle } from 'lucide-react';
 import { mockOrders } from '@/lib/mock-data';
 
+const recentOrders = mockOrders.slice(0, 5);
+
 export default function DashboardPage() {
   const totalCalls = mockOrders.length;
   const confirmedOrders = mockOrders.filter(o => o.status === 'Confirmed').length;
@@ -74,7 +76,7 @@ export default function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RecentCalls orders={mockOrders.slice(0, 5)} />
+          <RecentCalls orders={recentOrders} />
         </CardContent>
       </Card>
     </div>
